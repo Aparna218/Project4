@@ -9,7 +9,6 @@ mongoose.connect('mongodb+srv://aparna21:tpzmDVkZSc3mpMTf@cluster21.u69lmjr.mong
     useNewUrlParser: true
 }).then(() => console.log('MongoDb is connected.'))
     .catch(err => console.log(err));
-mongoose.set('strictQuery', true);
 
 app.use('/', route);
 
