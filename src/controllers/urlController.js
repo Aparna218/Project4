@@ -1,7 +1,7 @@
 const shortid = require('shortid');
+const validUrl = require('valid-url');
 const urlModel = require('../models/urlModel');
 const { isValidUrl, isValidBody } = require('../util/validator');
-
 
 //createUrl
 const createUrl = async (req, res) => {
@@ -9,6 +9,7 @@ const createUrl = async (req, res) => {
         const { longUrl } = req.body;
         if (!isValidBody(req.body)) return res.status(400).send({ status: false, message: 'Please enter data on the body.' });
         if (!isValidUrl(longUrl)) return res.status(400).send({ status: false, message: ` '${longUrl}' this url isn't valid.` });
+        if (!validUrl.isUri(longUrl)) return res.status(400).send({ status: false, message: 'Please enter valid url2' });
 
         let urlCode = shortid.generate().toLowerCase();
         const shortUrl = `http://localhost:3000/ + ${urlCode}`;
@@ -18,8 +19,13 @@ const createUrl = async (req, res) => {
             urlCode: urlCode
         }
 
-        await urlModel.create(data);
-        return res.status(201).send({ status: true, message: ` '${shortUrl}' this short url created successfully.`, data: data });
+        const newUrl = await urlModel.create(data);
+        const savaData = {
+            longUrl: newUrl.longUrl,
+            shortUrl: newUrl.shortUrl,
+            urlCode: newUrl.urlCode
+        }
+        return res.status(201).send({ status: true, message: 'ShortUrl created successfully.', data: savaData });
     } catch (err) {
         console.log(err);
         return res.status(500).send({ status: false, error: err.message });
