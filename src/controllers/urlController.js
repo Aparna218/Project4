@@ -37,19 +37,21 @@ const createUrl = async (req, res) => {
 const getUrl = async (req, res) => {
     try {
         const urlCode = req.params.urlCode;
+        if (!shortid.isValid(urlCode)) return res.status(400).send({ status: false, message: `'${urlCode}' this shortUrl is invalid` });
 
-        if (!shortid.isValid(urlCode)) return res.status(400).send({ status: false, message: `'${urlCode}' this shortUrl is invalid` })
+        //existsCache
+        let existsCache = await GET_ASYNC(`${urlCode}`);
+        existsCache = JSON.parse(existsCache);
+        if (existsCache) return res.status(302).redirect(existsCache.longUrl);
 
-        let cahcedUrlCode = await GET_ASYNC(`${urlCode}`)
-        if (cahcedUrlCode) return res.status(302).redirect(cahcedUrlCode.longUrl)
-
+        //existUrl
         const existUrl = await urlModel.findOne({ urlCode });
-        await SET_ASYNC(`${urlCode}`, JSON.stringify(existUrl))
-
         if (!existUrl) return res.status(404).send({ message: `No url found by this '${urlCode}' shortid.` });
-        return res.status(302).redirect(existUrl.longUrl)
 
-
+        //setCache
+        await SET_ASYNC(`${urlCode, existUrl.longUrl}`, JSON.stringify(existUrl));
+        // await SET_ASYNC(`${existUrl.longUrl}`, JSON.stringify(existUrl));
+        return res.status(302).redirect(existUrl.longUrl);
     } catch (err) {
         console.log(err);
         return res.status(500).send({ status: false, error: err.message });
@@ -57,4 +59,3 @@ const getUrl = async (req, res) => {
 };
 
 module.exports = { createUrl, getUrl };
-
