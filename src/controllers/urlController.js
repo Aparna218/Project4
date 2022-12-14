@@ -49,8 +49,7 @@ const getUrl = async (req, res) => {
         if (!existUrl) return res.status(404).send({ message: `No url found by this '${urlCode}' shortid.` });
 
         //setCache
-        await SET_ASYNC(`${urlCode, existUrl.longUrl}`, JSON.stringify(existUrl));
-        // await SET_ASYNC(`${existUrl.longUrl}`, JSON.stringify(existUrl));
+        await SET_ASYNC(`${urlCode}`, JSON.stringify(existUrl));
         return res.status(302).redirect(existUrl.longUrl);
     } catch (err) {
         console.log(err);
