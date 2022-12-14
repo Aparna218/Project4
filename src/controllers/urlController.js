@@ -40,10 +40,16 @@ const getUrl = async (req, res) => {
 
         if (!shortid.isValid(urlCode)) return res.status(400).send({ status: false, message: `'${urlCode}' this shortUrl is invalid` })
 
-        //existUrl
-        const existUrl = await urlModel.findOne({ urlCode })
+        let cahcedUrlCode = await GET_ASYNC(`${urlCode}`)
+        if (cahcedUrlCode) return res.status(302).redirect(cahcedUrlCode.longUrl)
+
+        const existUrl = await urlModel.findOne({ urlCode });
+        await SET_ASYNC(`${urlCode}`, JSON.stringify(existUrl))
+
         if (!existUrl) return res.status(404).send({ message: `No url found by this '${urlCode}' shortid.` });
         return res.status(302).redirect(existUrl.longUrl)
+
+
     } catch (err) {
         console.log(err);
         return res.status(500).send({ status: false, error: err.message });
@@ -51,3 +57,4 @@ const getUrl = async (req, res) => {
 };
 
 module.exports = { createUrl, getUrl };
+
