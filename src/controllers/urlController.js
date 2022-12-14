@@ -2,6 +2,7 @@ const shortid = require('shortid');
 const validUrl = require('valid-url');
 const urlModel = require('../models/urlModel');
 const { isValidUrl, isValidBody } = require('../util/validator');
+const { SET_ASYNC, GET_ASYNC } = require('../caching/redis');
 
 //createUrl
 const createUrl = async (req, res) => {
@@ -12,7 +13,7 @@ const createUrl = async (req, res) => {
         if (!validUrl.isUri(longUrl)) return res.status(400).send({ status: false, message: 'Please enter valid url2' });
 
         let urlCode = shortid.generate().toLowerCase();
-        const shortUrl = `http://localhost:3000/ + ${urlCode}`;
+        const shortUrl = `http://localhost:3000/${urlCode}`;
         const data = {
             longUrl: longUrl,
             shortUrl: shortUrl,
