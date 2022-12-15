@@ -4,7 +4,6 @@ const urlModel = require('../models/urlModel');
 const { isValidUrl, isValidBody } = require('../util/validator');
 const { SET_ASYNC, GET_ASYNC } = require('../caching/redis');
 
-
 //createUrl
 const createUrl = async (req, res) => {
     try {
